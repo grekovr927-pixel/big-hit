@@ -1,0 +1,284 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Биг Хит — Вкусно и точка</title>
+    <style>
+        /* Базовые настройки страницы */
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+        }
+
+        body {
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background: #111;
+            overflow: hidden;
+            position: relative;
+            color: #fff;
+        }
+
+        /* Анимированный живой фон с ОРАНЖЕВЫМИ пузырями */
+        .background-container {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: radial-gradient(circle at center, #1a0f00 0%, #050505 100%);
+            filter: blur(6px);
+            z-index: 1;
+            overflow: hidden;
+        }
+
+        .bubble {
+            position: absolute;
+            bottom: -100px;
+            background: radial-gradient(circle at 30% 30%, rgba(255, 123, 0, 0.4) 0%, rgba(255, 68, 0, 0.1) 70%);
+            border: 1px solid rgba(255, 140, 0, 0.2);
+            box-shadow: 0 0 15px rgba(255, 123, 0, 0.2);
+            border-radius: 50%;
+            animation: floatUp 12s infinite linear;
+        }
+
+        @keyframes floatUp {
+            0% {
+                transform: translateY(0) scale(1) translateX(0);
+                opacity: 0;
+            }
+            10% { opacity: 1; }
+            90% { opacity: 1; }
+            100% {
+                transform: translateY(-120vh) scale(1.4) translateX(80px);
+                opacity: 0;
+            }
+        }
+
+        /* Главная карточка и карточки окон (Эффект матового стекла) */
+        .card {
+            position: relative;
+            z-index: 2;
+            background: rgba(255, 255, 255, 0.06);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            padding: 40px;
+            border-radius: 24px;
+            text-align: center;
+            max-width: 450px;
+            width: 90%;
+            box-shadow: 0 20px 50px rgba(0,0,0,0.6);
+            
+            /* Стили для плавной смены экранов */
+            display: none;
+            opacity: 0;
+            transform: scale(0.9);
+            transition: opacity 0.4s ease, transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+
+        /* Класс для включения активного окна */
+        .card.active {
+            display: block;
+            opacity: 1;
+            transform: scale(1);
+        }
+
+        .card h1, .card h2 {
+            font-size: 2.2rem;
+            margin-bottom: 10px;
+            color: #ffc400;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .card h2 {
+            color: #ff7b00;
+            font-size: 1.8rem;
+            margin-bottom: 20px;
+        }
+
+        .card p {
+            color: #ccc;
+            margin-bottom: 30px;
+            font-size: 1.05rem;
+            line-height: 1.5;
+        }
+
+        /* Списки состава */
+        .card ul {
+            text-align: left;
+            margin: 0 auto 30px auto;
+            max-width: 320px;
+            line-height: 1.8;
+            color: #eee;
+        }
+
+        /* Контейнер для кнопок */
+        .btn-container {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        /* Стилизация интерактивных кнопок */
+        .custom-btn {
+            position: relative;
+            padding: 16px 28px;
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: #fff;
+            background: #1e1e1e;
+            border: none;
+            border-radius: 50px; /* Кнопки закруглены */
+            cursor: pointer;
+            outline: none;
+            text-decoration: none;
+            display: inline-block;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            overflow: hidden;
+            z-index: 1;
+            text-align: center;
+        }
+
+        /* Мягкая градиентная подсветка (красный, оранжевый, желтый) */
+        .custom-btn::before {
+            content: '';
+            position: absolute;
+            top: -2px; left: -2px; bottom: -2px; right: -2px;
+            background: linear-gradient(45deg, #ff003c, #ff7b00, #ffc400, #ff003c);
+            background-size: 400%;
+            border-radius: 50px;
+            z-index: -1;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+            animation: gradientShift 3s linear infinite; /* Переливается раз в 3 секунды */
+        }
+
+        @keyframes gradientShift {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+
+        /* Эффект наведения */
+        .custom-btn:hover {
+            transform: scale(1.06);
+        }
+
+        .custom-btn:hover::before {
+            opacity: 1;
+        }
+
+        /* Эффект нажатия (клик) */
+        .custom-btn:active {
+            transform: scale(0.95) !important;
+            filter: brightness(0.9);
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Живой задний фон с пузырями (работает непрерывно) -->
+    <div class="background-container" id="bg-container"></div>
+
+    <!-- ЭКРАН 1: Главное меню сайта -->
+    <div class="card active" id="main-card">
+        <h1>Биг Хит</h1>
+        <p>Легендарный бургер, который настолько хорош, что заменяет полноценный обед, антидепрессанты и абонемент в спортзал (особенно последнее)! 🍔</p>
+        
+        <div class="btn-container">
+            <!-- Переключение на состав -->
+            <button class="custom-btn" onclick="switchScreen('main-card', 'ingredients-card')">Рассекретить состав</button>
+            
+            <!-- Переключение на пасхалку -->
+            <button class="custom-btn" onclick="switchScreen('main-card', 'easter-card')">Для Амелии 🤫</button>
+            
+            <!-- Переход на внешний сайт (это браузеры не блокируют, так как есть прямая ссылка) -->
+            <a href="https://vkusnoitochka.ru" target="_blank" class="custom-btn">Свалить на офф. сайт</a>
+        </div>
+    </div>
+
+    <!-- ЭКРАН 2: Отдельное окно СОСТАВА -->
+    <div class="card" id="ingredients-card">
+        <h2>Настоящий состав 🧐</h2>
+        <ul>
+            <li>🌾 Булочка с кунжутом (и капелькой магии)</li>
+            <li>🥩 Два бифштекса (из говядины, честно!)</li>
+            <li>🧀 Сыр Чеддер (плавится быстрее твоей зарплаты)</li>
+            <li>🥒 Маринованные огурцы для хруста</li>
+            <li>🥬 Салат Айсберг (единственная зелень в твоей жизни)</li>
+            <li>🧅 Лук репчатый (чтобы никто не лез целоваться)</li>
+            <li>🍯 Секретный соус «Биг Хит» (рецепт охраняется лучше Пентагона)</li>
+        </ul>
+        <div class="btn-container">
+            <button class="custom-btn" onclick="switchScreen('ingredients-card', 'main-card')">Назад в меню</button>
+        </div>
+    </div>
+
+    <!-- ЭКРАН 3: Отдельное окно ПАСХАЛКИ -->
+    <div class="card" id="easter-card">
+        <h2>Официальное заявление! 💌</h2>
+        <p style="font-size: 1.25rem; margin: 20px 0; color: #fff; font-weight: bold; line-height: 1.5;">
+            Амелия, британские ученые доказали на 100%: <br>
+            <span style="color: #ffc400; font-size: 1.6rem; display: block; margin-top: 10px; text-transform: uppercase;">Рома просто пиздатый! 😎</span>
+        </p>
+        <p style="font-size: 0.85rem; color: #888; font-style: italic; margin-bottom: 30px;">
+            *Данные подтверждены Минздравом и кассиром из «Вкусно — и точка». Спорить бесполезно!
+        </p>
+        <div class="btn-container">
+            <button class="custom-btn" onclick="switchScreen('easter-card', 'main-card')">Полностью согласна!</button>
+        </div>
+    </div>
+
+    <script>
+        // Скрипт генерации движущихся оранжевых пузырей
+        const bgContainer = document.getElementById('bg-container');
+        const bubbleCount = 25;
+
+        for (let i = 0; i < bubbleCount; i++) {
+            const bubble = document.createElement('div');
+            bubble.classList.add('bubble');
+            
+            const size = Math.random() * 50 + 15;
+            const leftPos = Math.random() * 100;
+            const delay = Math.random() * 10;
+            const duration = Math.random() * 5 + 9;
+
+            bubble.style.width = `${size}px`;
+            bubble.style.height = `${size}px`;
+            bubble.style.left = `${leftPos}%`;
+            bubble.style.animationDelay = `${delay}s`;
+            bubble.style.animationDuration = `${duration}s`;
+
+            bgContainer.appendChild(bubble);
+        }
+
+        // БЕЗОПАСНЫЙ ФУНКЦИОНАЛ: плавное переключение между экранами без блокировок браузера
+        function switchScreen(currentId, nextId) {
+            const currentScreen = document.getElementById(currentId);
+            const nextScreen = document.getElementById(nextId);
+            
+            // Запускаем плавное исчезновение текущего окна
+            currentScreen.style.opacity = '0';
+            currentScreen.style.transform = 'scale(0.9)';
+            
+            setTimeout(() => {
+                currentScreen.classList.remove('active');
+                nextScreen.classList.add('active');
+                
+                // Небольшой таймаут, чтобы анимация появления отработала корректно
+                setTimeout(() => {
+                    nextScreen.style.opacity = '1';
+                    nextScreen.style.transform = 'scale(1)';
+                }, 50);
+            }, 400); // Время совпадает с transition в CSS
+        }
+    </script>
+</body>
+</html>
